@@ -59,6 +59,9 @@ function initialLoadContent(listName) {
             TodoListManager.changeTaskStatus(taskName, listName);
             TodoListManager.updateLocalStorage();
 
+            if (task.dataset.taskIsChecked === 'true') task.dataset.taskIsChecked = 'false';
+            else task.dataset.taskIsChecked = 'true';
+
         } else if (e.target.classList.contains('delete-task')) {
             const modalDeleteTask = document.querySelector('.modal.delete-task');
             modalDeleteTask.dataset.taskId = task.id;

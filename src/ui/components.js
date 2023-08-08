@@ -129,8 +129,10 @@ export function asideSection(...dialogs) {
 // Some small component for creating and manipulating
 export function taskItemComponent(name, details, dueDate, priority, isChecked) {
     const task = document.createElement('li');
-    task.classList.add('task');
     task.id = `task-${removeWhiteSpace(name)}`;
+    task.classList.add('task');
+    task.dataset.taskPriority = priority;
+    task.dataset.taskIsChecked = isChecked;
 
     const taskPriority = document.createElement('div');
     taskPriority.classList.add('task__priority');
@@ -514,7 +516,7 @@ function handleTask(e, prevName, prevTaskEl) {
     TodoListManager.updateLocalStorage();
 
     const taskList = document.body.querySelector('.task-list');
-    taskList.insertAdjacentElement('beforeend', taskItemComponent(name, details, dueDate, priority, false));
+    taskList.append(taskItemComponent(name, details, dueDate, priority, false));
 
     return true;
 }

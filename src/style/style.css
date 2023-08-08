@@ -1,3 +1,5 @@
+/* @import url('../images/empty-space_black.svg'); */
+
 :root {
     --clr-accent: #31af91;
     --clr-gray: #eee;
@@ -234,7 +236,6 @@ main {
         gap: 1rem;
 
         overflow: auto;
-        transition: .3s;
     }
 
     .task {
@@ -247,6 +248,36 @@ main {
 
         padding: calc(var(--spacing-padding) - .8rem) var(--spacing-padding);
         border-radius: .3em;
+
+        &[data-task-priority='1'] {
+            order: 1;
+        }
+
+        &[data-task-priority='2'] {
+            order: 2;
+        }
+
+        &[data-task-priority='3'] {
+            order: 3;
+        }
+
+        &[data-task-priority='4'] {
+            order: 4;
+        }
+
+        &[data-task-is-checked='true'] {
+            order: 5;
+            opacity: .5;
+            filter: grayscale(.5);
+        }
+
+        &:hover {
+            background: var(--clr-gray);
+
+            .task__btns {
+                display: flex;
+            }
+        }
 
         &__priority {
             position: absolute;
@@ -267,7 +298,7 @@ main {
             }
 
             &[data-priority='3'] {
-                background: lightgreen;
+                background: var(--clr-accent);
             }
         }
 
@@ -311,14 +342,6 @@ main {
 
             font-size: 1.3rem;
             cursor: pointer;
-        }
-
-        &:hover {
-            background: var(--clr-gray);
-
-            .task__btns {
-                display: flex;
-            }
         }
     }
 }

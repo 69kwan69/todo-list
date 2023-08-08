@@ -19,7 +19,7 @@ function showLocalStorage(listName) {
     console.dir(data);
 }
 
-showLocalStorage('Personal');
+// showLocalStorage('Personal');
 load();
 
 console.log(document.querySelectorAll('.list-name'));
