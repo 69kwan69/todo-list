@@ -13,10 +13,11 @@ export default class TodoListManager {
         return TodoListManager.getList(listName).tasks;
     }
 
-    // static getTask(listName, taskName) {
-    //     const tasks = TodoListManager.getTasksFrom(listName);
-    //     return tasks
-    // }
+    static getRemainingTasks(listName) {
+        let remains = 0;
+        TodoListManager.getList(listName).tasks.forEach(task => task.isChecked || remains++);
+        return remains;
+    }
 
 
     // LocalStorage

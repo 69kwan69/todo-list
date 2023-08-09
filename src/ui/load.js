@@ -36,13 +36,17 @@ function initialLoadContent(listName) {
         .getTasksFrom(listName)
         .forEach(task => taskList.append(Components.taskItemComponent(task.name, task.details, task.dueDate, task.priority, task.isFinished())));
 
+    const main = document.querySelector('main');
+    if (main) main.remove();
+
     const html = Components.contentSection(listName);
     document.body.insertAdjacentHTML('beforeend', html);
 
     const contentHeader = document.querySelector('.content-header');
     contentHeader.insertAdjacentElement('afterend', taskList);
 
-    // Insert DOM here
+
+    // Task's event handler (event delegation)
     const newTaskBtn = document.querySelector('.btn.new-task');
     newTaskBtn.addEventListener('click', () => {
         const modalNewTask = document.querySelector('.modal.new-task');

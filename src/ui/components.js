@@ -54,14 +54,13 @@ export function sideBarSection(...listTabs) {
             const listTab = e.target.closest('.tab');
             modal.dataset.listId = listTab.id;
             modal.showModal();
+
         } else if (e.target.classList.contains('tab')) {
             const listName = e.target.querySelector('.tab__list-name').textContent;
-            const main = document.querySelector('main');
-            const currentListName = main.querySelector('.list-name').textContent;
 
+            const currentListName = document.querySelector('.list-name').textContent;
             if (listName === currentListName) return;
 
-            main.remove();
             initialLoadContent(listName);
 
             const currentListTab = ulGroupMyLists.querySelector('.active');
@@ -459,13 +458,13 @@ export function modalDeleteList() {
     btnConfirm.addEventListener('click', () => {
         const listTab = document.querySelector(`#${modal.dataset.listId}`);
         const listName = listTab.querySelector('p').textContent;
-        console.log(listName);
 
         TodoListManager.deleteList(listName);
         TodoListManager.updateLocalStorage();
 
-        modal.close();
+        if (listName === document.querySelector('.list-name').textContent) initialLoadContent('Personal');
         listTab.remove();
+        modal.close();
     });
 
     const btnCancel = modal.querySelector('.btn.cancel');

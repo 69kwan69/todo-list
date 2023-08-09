@@ -5,6 +5,7 @@ import logoURL from './images/logo.png'
 import userAvatarURL from './images/user.png'
 
 import { initialLoadContent, initialLoadSideBar, initialLoadHeader, initialLoadAside } from './ui/load';
+import TodoListManager from './features/todoListManager';
 
 function load() {
     initialLoadHeader(logoURL, userAvatarURL);
@@ -23,10 +24,5 @@ function showLocalStorage(listName) {
 load();
 
 console.log(document.querySelectorAll('.list-name'));
-
-
-// console.dir(document.querySelectorAll('.tab__list-name'));
-
-// const modal = confirmDeleteTaskModal();
-// document.body.append(asideSection(modal));
-// modal.showModal();
+console.log(TodoListManager.getRemainingTasks('Personal'));
+console.log(document.querySelector('.list-name'));
