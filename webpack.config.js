@@ -7,6 +7,7 @@ module.exports = {
         filename: 'main.js',
         path: path.resolve(__dirname, 'dist'),
         clean: true,
+        assetModuleFilename: './asset/[name]-[hash][ext]',
     },
     mode: 'development',
     devtool: 'inline-source-map',
@@ -33,13 +34,9 @@ module.exports = {
             },
             {
                 test: /\.(png|jpeg|jpg|svg|gif)$/i,
-                use: {
-                    loader: 'file-loader',
-                    options: {
-                        esModule: false,
-                        name: "[name].[hash].[ext]",
-                        outputPath: "imgs"
-                    }
+                type: 'asset/resource',
+                generator: {
+                    filename: './images/[hash][ext]',
                 }
             },
         ],
