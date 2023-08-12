@@ -1,5 +1,7 @@
+import { addDays, formatRelative, intlFormatDistance } from "date-fns";
 import TodoListManager from "../features/todoListManager";
 import { initialLoadContent } from "./load";
+import enGB from 'date-fns/locale/en-GB';
 
 
 // Main sections for initial load
@@ -291,8 +293,24 @@ export function taskItemComponent(name, details, dueDate, priority, isChecked, l
 
 
     const taskDueDate = document.createElement('p');
-    taskDueDate.classList.add('task__due-date')
-    taskDueDate.textContent = dueDate;
+    taskDueDate.classList.add('task__due-date');
+
+    // A solution to ignoring time when comparing date after modified
+    // https://github.com/date-fns/date-fns/issues/1218
+    const formatRelativeLocale = {
+        lastWeek: "eeee",
+        yesterday: "'Yesterday'",
+        today: "'Today'",
+        tomorrow: "'Tomorrow'",
+        nextWeek: "'Next' eeee",
+        other: 'dd/MM/yyyy',
+    };
+
+    const locale = {
+        ...enGB,
+        formatRelative: (token) => formatRelativeLocale[token],
+    };
+    taskDueDate.textContent = formatRelative(new Date(dueDate), new Date(), { locale });
 
 
     const taskBtns = document.createElement('div');
@@ -623,7 +641,9 @@ function handleTask(e, prevName, prevTaskEl) {
     const dueDate = e.currentTarget.querySelector('[name=due-date]').value;
     const radioBtns = [...e.currentTarget.querySelectorAll('[name=priority]')];
     const priority = radioBtns.find(button => button.checked === true).value;
-    const listName = JSON.parse(prevTaskEl.dataset.task).listName;
+    const listName = (prevTaskEl)
+        ? JSON.parse(prevTaskEl.dataset.task).listName
+        : document.querySelector('.list-name').textContent;
     // const listName = cool.list
 
     if (name !== prevName) {

@@ -364,6 +364,7 @@ main {
 
         &__due-date {
             user-select: none;
+            white-space: nowrap;
         }
 
         &__btns {
