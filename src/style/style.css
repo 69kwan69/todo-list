@@ -246,7 +246,7 @@ main {
         overflow: auto;
 
         &:empty {
-            background: url('../images/empty-space_black.svg') no-repeat center / auto;
+            background: url('../images/empty-background_black.svg') no-repeat center / auto;
             height: 100%;
             opacity: .5;
         }
