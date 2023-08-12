@@ -24,5 +24,7 @@ function showLocalStorage(listName) {
 load();
 
 console.log(document.querySelectorAll('.list-name'));
-console.log(TodoListManager.getRemainingTasks('Personal'));
+// console.log(TodoListManager.getRemainingTasks('Personal'));
 console.log(document.querySelector('.list-name'));
+console.log(TodoListManager.getTodayTasks());
+console.log(TodoListManager.getWeekTasks());

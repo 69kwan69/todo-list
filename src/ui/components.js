@@ -22,6 +22,48 @@ export function headerSection(logoURL, userAvatarURL) {
 export function sideBarSection(...listTabs) {
     const ulGroupDefault = document.createElement('ul');
     ulGroupDefault.classList.add('group', 'default');
+    ulGroupDefault.addEventListener('click', e => {
+        if (e.target.id !== 'Today' && e.target.id !== 'This-week') return;
+
+        initialLoadContent('Personal');
+        const main = document.querySelector('main');
+
+        const listName = main.querySelector('.list-name');
+
+        const btn = main.querySelector('.btn.new-task');
+        btn.remove();
+
+        const ul = main.querySelector('.task-list');
+        ul.innerHTML = '';
+        ul.removeAttribute('data-list-name');
+
+        let tasks;
+        if (e.target.id === 'Today') {
+            listName.textContent = 'Today';
+            tasks = TodoListManager.getTodayTasks();
+
+        } else if (e.target.id === 'This-week') {
+            listName.textContent = 'This Week';
+            tasks = TodoListManager.getWeekTasks();
+        }
+
+        tasks.forEach(list => {
+            list.tasks.forEach(task => {
+                ul.append(taskItemComponent(
+                    task.name,
+                    task.details,
+                    task.dueDate,
+                    task.priority,
+                    task.isChecked,
+                    list.listName
+                ))
+            })
+        })
+
+        const currentListTab = navCardSection.querySelector('.active');
+        if (currentListTab) currentListTab.classList.remove('active');
+        e.target.classList.add('active');
+    })
 
     const defaultTabs = ['Today', 'This week'];
     for (const tabName of defaultTabs) {
@@ -63,7 +105,7 @@ export function sideBarSection(...listTabs) {
 
             initialLoadContent(listName);
 
-            const currentListTab = ulGroupMyLists.querySelector('.active');
+            const currentListTab = navCardSection.querySelector('.active');
             if (currentListTab) currentListTab.classList.remove('active');
             e.target.classList.add('active');
         }
@@ -99,14 +141,93 @@ export function sideBarSection(...listTabs) {
 }
 
 export function contentSection(listName) {
-    return `
-            <main class='card-section'>
-                <div class='content-header'>
-                    <h2 class='list-name'>${listName}</h2>
-                    <button class='btn new-task accent'><i class="fa-solid fa-plus"></i> New Task</button>
-                </div>
-            </main>
-            `;
+    const main = document.createElement('main');
+    main.classList.add('card-section');
+
+    const divContentHeader = document.createElement('div');
+    divContentHeader.classList.add('content-header');
+
+    const h2ListName = document.createElement('h2');
+    h2ListName.classList.add('list-name');
+    h2ListName.textContent = listName;
+
+    const btnNewTask = document.createElement('button');
+    btnNewTask.classList.add('btn', 'new-task', 'accent');
+    btnNewTask.innerHTML = '<i class="fa-solid fa-plus"></i> New Task';
+    btnNewTask.addEventListener('click', () => {
+        const modalNewTask = document.querySelector('.modal.new-task');
+        modalNewTask.showModal();
+    })
+
+    divContentHeader.append(h2ListName, btnNewTask);
+
+    const ulTaskList = document.createElement('ul');
+    ulTaskList.classList.add('task-list');
+    ulTaskList.dataset.listName = listName;
+    TodoListManager
+        .getTasksFrom(listName)
+        .forEach(task => ulTaskList
+            .append(taskItemComponent(
+                task.name,
+                task.details,
+                task.dueDate,
+                task.priority,
+                task.isFinished(),
+                listName)));
+    ulTaskList.addEventListener('click', e => {
+        const task = e.target.closest('.task');
+
+        if (e.target.classList.contains('task__checkbox')) {
+            const { name, listName } = JSON.parse(task.dataset.task);
+
+            TodoListManager.changeTaskStatus(name, listName);
+            TodoListManager.updateLocalStorage();
+
+            if (task.dataset.taskIsChecked === 'true') task.dataset.taskIsChecked = 'false';
+            else task.dataset.taskIsChecked = 'true';
+
+        } else if (e.target.classList.contains('delete-task')) {
+            const modalDeleteTask = document.querySelector('.modal.delete-task');
+            modalDeleteTask.dataset.taskId = task.id;
+            modalDeleteTask.showModal();
+
+        } else if (e.target.classList.contains('edit-task')) {
+            const { name, details, dueDate, priority } = JSON.parse(task.dataset.task);
+
+            const modalEditTask = document.querySelector('.modal.edit-task');
+            modalEditTask.dataset.taskId = task.id;
+            modalEditTask.dataset.prevTaskName = name;
+
+            const inputName = modalEditTask.querySelector('[name="name"]');
+            inputName.value = name;
+
+            const textareaDetails = modalEditTask.querySelector('[name="details"]');
+            textareaDetails.value = details;
+
+            const inputDueDate = modalEditTask.querySelector('[name="due-date"]');
+            inputDueDate.value = dueDate;
+
+            const priorities = [...modalEditTask.querySelectorAll('[name="priority"]')];
+            priorities[3].checked = false;
+            priorities[parseInt(priority) - 1].checked = true;
+
+            modalEditTask.showModal();
+        }
+    })
+
+    main.append(divContentHeader, ulTaskList);
+
+    return main;
+
+    // return `
+    //         <main class='card-section'>
+    //             <div class='content-header'>
+    //                 <h2 class='list-name'>${listName}</h2>
+    //                 <button class='btn new-task accent'><i class="fa-solid fa-plus"></i> New Task</button>
+    //             </div>
+    //             <ul class="task-list" data-list-name="Personal"></ul>
+    //         </main>
+    //         `;
 }
 
 export function asideSection(...dialogs) {
@@ -126,16 +247,19 @@ export function asideSection(...dialogs) {
 
 
 // Some small component for creating and manipulating
-export function taskItemComponent(name, details, dueDate, priority, isChecked) {
+export function taskItemComponent(name, details, dueDate, priority, isChecked, listName) {
     const task = document.createElement('li');
     task.id = `task-${removeWhiteSpace(name)}`;
     task.classList.add('task');
     task.dataset.taskPriority = priority;
     task.dataset.taskIsChecked = isChecked;
+    task.dataset.task = JSON.stringify({ name, details, dueDate, priority, listName });
+
 
     const taskPriority = document.createElement('div');
     taskPriority.classList.add('task__priority');
-    taskPriority.dataset.priority = priority;
+    // taskPriority.dataset.priority = priority;
+
 
     const taskCheckbox = document.createElement('input');
     taskCheckbox.classList.add('task__checkbox');
@@ -143,17 +267,33 @@ export function taskItemComponent(name, details, dueDate, priority, isChecked) {
     taskCheckbox.type = 'checkbox';
     taskCheckbox.checked = isChecked;
 
+
     const taskText = document.createElement('label');
     taskText.classList.add('task__text');
     taskText.setAttribute('for', removeWhiteSpace(name));
+
 
     const h3Name = document.createElement('h3');
     h3Name.classList.add('name');
     h3Name.textContent = name;
 
+    const spanListName = document.createElement('span');
+    spanListName.classList.add('from-list-name');
+    spanListName.textContent = ` (${listName})`;
+
+    h3Name.append(spanListName);
+
     const pDetails = document.createElement('p');
     pDetails.classList.add('details');
     pDetails.textContent = details;
+
+    taskText.append(h3Name, pDetails)
+
+
+    const taskDueDate = document.createElement('p');
+    taskDueDate.classList.add('task__due-date')
+    taskDueDate.textContent = dueDate;
+
 
     const taskBtns = document.createElement('div');
     taskBtns.classList.add('task__btns');
@@ -166,20 +306,14 @@ export function taskItemComponent(name, details, dueDate, priority, isChecked) {
     btnDeleteTask.classList.add('btn', 'delete-task');
     btnDeleteTask.innerHTML = '<i class="fa-solid fa-xmark"></i>'
 
-    taskText.append(
-        h3Name,
-        pDetails
-    )
+    taskBtns.append(btnEditTask, btnDeleteTask)
 
-    taskBtns.append(
-        btnEditTask,
-        btnDeleteTask
-    )
 
     task.append(
         taskPriority,
         taskCheckbox,
         taskText,
+        taskDueDate,
         taskBtns
     )
 
@@ -326,7 +460,6 @@ export function modalEditTask() {
     form.addEventListener('submit', e => {
         e.preventDefault();
         const prevTaskName = modal.dataset.prevTaskName;
-        console.log(modal.dataset.taskId);
         const prevTaskEl = document.querySelector(`#${modal.dataset.taskId}`);
 
         if (handleTask(e, prevTaskName, prevTaskEl)) modal.close();
@@ -355,10 +488,9 @@ export function modalDeleteTask() {
     buttonDeleteTask.textContent = 'Delete';
     buttonDeleteTask.addEventListener('click', () => {
         const task = document.querySelector(`#${modal.dataset.taskId}`);
-        const taskName = task.querySelector('.name').textContent;
-        const listName = task.closest('.task-list').dataset.listName;
+        const { name, listName } = JSON.parse(task.dataset.task);
 
-        TodoListManager.deleteTask(taskName, listName);
+        TodoListManager.deleteTask(name, listName);
         TodoListManager.updateLocalStorage();
 
         task.remove();
@@ -474,6 +606,7 @@ export function modalDeleteList() {
 }
 
 
+// Utility functions
 function normalToKebab(text) {
     return text
         .toLowerCase()
@@ -490,7 +623,8 @@ function handleTask(e, prevName, prevTaskEl) {
     const dueDate = e.currentTarget.querySelector('[name=due-date]').value;
     const radioBtns = [...e.currentTarget.querySelectorAll('[name=priority]')];
     const priority = radioBtns.find(button => button.checked === true).value;
-    const listName = document.body.querySelector('.list-name').textContent;
+    const listName = JSON.parse(prevTaskEl.dataset.task).listName;
+    // const listName = cool.list
 
     if (name !== prevName) {
         const taskExisted = TodoListManager
@@ -515,7 +649,7 @@ function handleTask(e, prevName, prevTaskEl) {
     TodoListManager.updateLocalStorage();
 
     const taskList = document.body.querySelector('.task-list');
-    taskList.append(taskItemComponent(name, details, dueDate, priority, false));
+    taskList.append(taskItemComponent(name, details, dueDate, priority, false, listName));
 
     return true;
 }

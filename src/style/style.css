@@ -250,6 +250,12 @@ main {
             height: 100%;
             opacity: .5;
         }
+
+        &[data-list-name] {
+            .from-list-name {
+                display: none;
+            }
+        }
     }
 
     .task {
@@ -265,14 +271,26 @@ main {
 
         &[data-task-priority='1'] {
             order: 1;
+
+            .task__priority {
+                background: lightcoral;
+            }
         }
 
         &[data-task-priority='2'] {
             order: 2;
+
+            .task__priority {
+                background: lightsalmon;
+            }
         }
 
         &[data-task-priority='3'] {
             order: 3;
+
+            .task__priority {
+                background: var(--clr-accent);
+            }
         }
 
         &[data-task-priority='4'] {
@@ -288,6 +306,10 @@ main {
         &:hover {
             background: var(--clr-gray);
 
+            .task__due-date {
+                display: none;
+            }
+
             .task__btns {
                 display: flex;
             }
@@ -302,18 +324,6 @@ main {
             width: 5px;
 
             border-radius: .3em;
-
-            &[data-priority='1'] {
-                background: lightcoral;
-            }
-
-            &[data-priority='2'] {
-                background: lightsalmon;
-            }
-
-            &[data-priority='3'] {
-                background: var(--clr-accent);
-            }
         }
 
         &__checkbox {
@@ -340,6 +350,11 @@ main {
             .name {
                 font-weight: bold;
                 font-size: 1.2rem;
+
+                .from-list-name {
+                    font-weight: initial;
+                    font-size: 1rem;
+                }
             }
 
             .details {
@@ -347,15 +362,34 @@ main {
             }
         }
 
+        &__due-date {
+            user-select: none;
+        }
+
         &__btns {
             display: none;
             align-items: center;
+            gap: 1rem;
 
-            position: absolute;
-            right: var(--spacing-padding);
-
-            font-size: 1.3rem;
+            transition: .25s;
             cursor: pointer;
+
+            &>* {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                padding: initial;
+                aspect-ratio: 1 / 1;
+            }
+
+            &> :first-child {
+                font-size: 1.2rem;
+            }
+
+            &> :last-child {
+                font-size: 1.4rem;
+            }
         }
     }
 }
