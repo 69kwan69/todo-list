@@ -1,14 +1,15 @@
 import * as Components from './components';
+import * as Sections from './sections';
 import TodoListManager from "../features/todoListManager";
 
 
 function initialLoadHeader(logoURL, userAvatarURL) {
-    const html = Components.headerSection(logoURL, userAvatarURL);
+    const html = Sections.headerSection(logoURL, userAvatarURL);
     document.body.insertAdjacentHTML('beforeend', html);
 }
 
 function initialLoadAside() {
-    const el = Components.asideSection(
+    const el = Sections.asideSection(
         Components.modalNewTask(),
         Components.modalDeleteTask(),
         Components.modalEditTask(),
@@ -22,16 +23,15 @@ function initialLoadSideBar() {
         if (index < 2) listTabs.push(Components.listTabComponent(list.name, true));
         else listTabs.push(Components.listTabComponent(list.name))
     })
-    const el = Components.sideBarSection(...listTabs);
+    const el = Sections.sideBarSection(...listTabs);
     document.body.insertAdjacentElement('beforeend', el);
 }
 
 function initialLoadContent(listName) {
-    // Insert HTML template
     const main = document.querySelector('main');
     if (main) main.remove();
 
-    const el = Components.contentSection(listName);
+    const el = Sections.contentSection(listName);
     document.body.insertAdjacentElement('beforeend', el);
 }
 

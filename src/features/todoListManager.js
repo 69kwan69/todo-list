@@ -14,12 +14,6 @@ export default class TodoListManager {
         return TodoListManager.getList(listName).tasks;
     }
 
-    // static getRemainingTasks(listName) {
-    //     let remains = 0;
-    //     TodoListManager.getList(listName).tasks.forEach(task => task.isChecked || remains++);
-    //     return remains;
-    // }
-
     static getTodayTasks() {
         const todayTasks = [];
         const today = new Date();
@@ -38,7 +32,6 @@ export default class TodoListManager {
         const today = new Date();
         const weekStart = startOfWeek(today);
         const weekEnd = endOfWeek(today);
-        console.log({ weekStart, weekEnd })
 
         TodoListManager.lists.forEach(list => {
             weekTasks.push({
